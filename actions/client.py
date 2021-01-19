@@ -1,4 +1,5 @@
 import json
+import os
 
 import requests
 
@@ -7,7 +8,7 @@ class Client:
     token = None
     base_url = 'https://api.github.com/'
 
-    def __init__(self, token):
+    def __init__(self, token=os.environ['GITHUB_TOKEN']):
         self.token = token
 
     @property
