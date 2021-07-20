@@ -4,11 +4,19 @@ import os
 import requests
 
 
+class ClientException(Exception):
+    pass
+
+
+class MissingTokenException(ClientException):
+    pass
+
+
 class Client:
     token = None
     base_url = 'https://api.github.com/'
 
-    def __init__(self, token=os.environ['GITHUB_TOKEN']):
+    def __init__(self, token=os.environ.get('GITHUB_TOKEN')):
         self.token = token
 
     @property
@@ -20,4 +28,6 @@ class Client:
         }
 
     def request(self, method, url):
+        if self.token is None:
+            raise MissingTokenException("Tried to make a request with no authorization token")
         return json.loads(requests.request(method=method, url=self.base_url+url, headers=self.headers).content)
