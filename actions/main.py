@@ -2,8 +2,8 @@ import os
 
 import click
 
-from client import Client
-from utils import list_issue_numbers
+from actions.client import Client
+from actions.utils import list_issue_numbers
 
 
 @click.group()
