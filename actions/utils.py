@@ -1,4 +1,7 @@
+import os
 import re
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def list_issue_numbers(line, keyword):
@@ -13,6 +16,14 @@ def list_issue_numbers(line, keyword):
                 issue_numbers.append(issue.number)
 
     return issue_numbers
+
+
+def owner(repo_slash_owner):
+    return repo_slash_owner.split('/')[0]
+
+
+def repo(repo_slash_owner):
+    return repo_slash_owner.split('/')[1]
 
 
 class Issue:

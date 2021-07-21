@@ -1,0 +1,12 @@
+query($repo: String!, $owner: String!, $issue_number: Int!) {
+	repository(name: $repo, owner: $owner) {
+		issue(number: $issue_number) {
+			projectCards {
+				nodes {
+					databaseId
+					createdAt
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,12 @@
+query($repo: String!, $owner: String!, $pull_request: Int!) {
+	repository(name: $repo, owner: $owner) {
+		pullRequest(number: $pull_request) {
+			bodyText
+			comments(first: 100) {
+				nodes {
+					bodyText
+				}
+			}
+		}
+	}
+}

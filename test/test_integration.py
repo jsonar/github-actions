@@ -10,6 +10,7 @@ from actions.main import main
 def validate_environent():
     assert 'GITHUB_TOKEN' in os.environ, 'This test must be run with the GITHUB_TOKEN env variable'
 
+
 def test_project():
     os.environ['GITHUB_REPOSITORY'] = 'jsonar/audit-policy'
     runner = CliRunner()

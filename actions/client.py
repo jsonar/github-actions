@@ -3,6 +3,8 @@ import os
 
 import requests
 
+from actions.utils import ROOT_DIR, repo, owner
+
 
 class ClientException(Exception):
     pass
@@ -14,20 +16,26 @@ class MissingTokenException(ClientException):
 
 class Client:
     token = None
-    base_url = 'https://api.github.com/'
 
     def __init__(self, token=os.environ.get('GITHUB_TOKEN')):
         self.token = token
 
     @property
     def headers(self):
-        return {
-            'Accept': 'application/vnd.github.starfox-preview+json, application/vnd.github.inertia-preview+json,'
-                      'application/vnd.github.v3+json',
-            'Authorization': f'token {self.token}'
-        }
+        return {'Authorization': f'token {self.token}'}
 
-    def request(self, method, url):
+    def request(self, query_file, variables):
         if self.token is None:
             raise MissingTokenException("Tried to make a request with no authorization token")
-        return json.loads(requests.request(method=method, url=self.base_url+url, headers=self.headers).content)
+        with open(os.path.join(ROOT_DIR, 'graphql', query_file)) as f:
+            query = f.read()
+        repo_slash_owner = os.environ['GITHUB_REPOSITORY']
+        body = {
+            'query': query,
+            'variables': {
+                **variables,
+                'repo': repo(repo_slash_owner),
+                'owner': owner(repo_slash_owner)
+            }
+        }
+        return json.loads(requests.post(url='https://api.github.com/graphql', headers=self.headers, json=body).content)
