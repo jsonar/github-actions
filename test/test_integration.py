@@ -7,8 +7,9 @@ from actions.main import main
 
 
 @pytest.fixture(scope='module', autouse=True)
-def validate_environent():
+def validate_environment():
     assert 'GITHUB_TOKEN' in os.environ, 'This test must be run with the GITHUB_TOKEN env variable'
+
 
 def test_project():
     os.environ['GITHUB_REPOSITORY'] = 'jsonar/audit-policy'

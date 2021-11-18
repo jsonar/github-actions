@@ -1,5 +1,3 @@
-import os
-
 import click
 
 from actions.client import Client
@@ -16,11 +14,10 @@ def main(context):
 @main.command()
 @click.option('--issue-id', required=True, type=int, help='the issue whose project is to be retrieved')
 def project(issue_id):
-    """Retrieve project id for given issue"""
-    events = Client().request(method='GET', url=f'repos/{os.environ["GITHUB_REPOSITORY"]}/issues/{issue_id}/events')
-    added_to_project_events = filter(lambda event: event['event'] == 'added_to_project', events)
-    latest_event = max(added_to_project_events, key=lambda event: event['created_at'])
-    click.echo(latest_event['project_card']['id'])
+    """Retrieve project card id for given issue"""
+    response = Client().request('project.graphql', {'issue_number': issue_id})
+    cards = response['data']['repository']['issue']['projectCards']['nodes']
+    click.echo(max(cards, key=lambda card: card['createdAt'])['databaseId'])
 
 
 @main.command()
@@ -28,13 +25,13 @@ def project(issue_id):
 @click.option('--keyword', type=str, default='resolves', help='Prefix for ')
 def issues(pr, keyword):
     client = Client()
-    raw_comments = client.request(method='GET', url=f'repos/{os.environ["GITHUB_REPOSITORY"]}/issues/{pr}/comments')
-    comments = [raw_comment['body'] for raw_comment in raw_comments]
-    comments.append(client.request(method='GET', url=f'repos/{os.environ["GITHUB_REPOSITORY"]}/pulls/{pr}')['body'])
+    pull_request_data = client.request('comments.graphql', {'pull_request': pr})['data']['repository']['pullRequest']
+    comments = [node['bodyText'] for node in pull_request_data['comments']['nodes']]
+    comments.append(pull_request_data['bodyText'])
     issue_numbers = set()
     for comment in comments:
         issue_numbers.update(list_issue_numbers(comment, keyword))
-    click.echo(" ".join(issue_numbers))
+    click.echo(' '.join(issue_numbers))
 
 
 if __name__ == '__main__':
